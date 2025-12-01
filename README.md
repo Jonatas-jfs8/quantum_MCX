@@ -1,9 +1,9 @@
 # quantum_MCX
 
-## artigo
+## Artigo
 
 Rise of conditionally clean ancillae for efficient quantum circuit constructions
 
-## link
+## Link
 
 https://quantum-journal.org/papers/q-2025-05-21-1752/
