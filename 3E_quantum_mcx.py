@@ -4,6 +4,7 @@ from qclib.util import get_state
 def quantum_mcx(circuito, controles, alvo):
 
     num_controles = len(controles)
+    eh_par = num_controles % 2 == 0
     qubit_alvo = circuito.qubits[alvo]
 
     aux = QuantumRegister(1, name='auxiliares')
@@ -18,15 +19,24 @@ def quantum_mcx(circuito, controles, alvo):
     circuito.barrier()
 
     # Passo 2
-    for i in range(0, num_controles-3):
+    start = 0
+    end = num_controles - 3
+    if eh_par:
+        end += 1
+    for i in range(start, end):
         circuito.x(controles[i])
 
     circuito.barrier()
 
     # Passo 3
-    circuito.ccx(controles[num_controles - 1], controles[num_controles - 4], controles[num_controles - 5])
-    for i in range(num_controles - 5, 1, -2):
-        circuito.ccx(controles[i], controles[i - 1], controles[i - 2])
+    if eh_par:
+        circuito.cx(controles[num_controles - 3], controles[num_controles - 4])
+        for i in range(num_controles - 4, 1, -2):
+            circuito.ccx(controles[i], controles[i - 1], controles[i - 2])
+    else:
+        circuito.ccx(controles[num_controles - 1], controles[num_controles - 4], controles[num_controles - 5])
+        for i in range(num_controles - 5, 1, -2):
+            circuito.ccx(controles[i], controles[i - 1], controles[i - 2])
 
     circuito.barrier()
 
@@ -36,20 +46,34 @@ def quantum_mcx(circuito, controles, alvo):
     circuito.barrier()
 
     # Passo 5
-    for i in range(0, num_controles - 5, 2):
-        circuito.ccx(controles[i+1], controles[i+2], controles[i])
-    circuito.ccx(controles[num_controles - 1], controles[num_controles - 4], controles[num_controles - 5])
+    if eh_par:
+        for i in range(0, num_controles - 4, 2):
+            circuito.ccx(controles[i+1], controles[i+2], controles[i])
+        circuito.cx(controles[num_controles - 3], controles[num_controles - 4])
+    else:
+        for i in range(0, num_controles - 5, 2):
+            circuito.ccx(controles[i+1], controles[i+2], controles[i])
+        circuito.ccx(controles[num_controles - 1], controles[num_controles - 4], controles[num_controles - 5])
 
     circuito.barrier()
 
     # Passo 6
-    for i in range(0, num_controles - 3):
+    start = 0
+    end = num_controles - 3
+    if eh_par:
+        end += 1
+    for i in range(start, end):
         circuito.x(controles[i])
 
     circuito.barrier()
 
     # Passo 7
-    for i in range(num_controles - 2, 1, -2):
+    start = num_controles - 2
+    end = 1
+    if eh_par:
+        start += 1
+        end += 1
+    for i in range(start, end, -2):
         circuito.ccx(controles[i], controles[i-1], controles[i-2])
     circuito.ccx(controles[0], controles[1], aux[0])
 
@@ -57,8 +81,8 @@ def quantum_mcx(circuito, controles, alvo):
 
 if __name__ == '__main__':
 
-    circuito = QuantumCircuit(6)
-    controles = [1,2,3,4,5]
+    circuito = QuantumCircuit(11)
+    controles = [1,2,3,4,5,6,7,8,9,10]
     alvo = 0
 
     for i in controles:
