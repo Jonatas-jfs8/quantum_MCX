@@ -51,4 +51,3 @@ if __name__ == '__main__':
     quantum_mcx(circuito, controles, alvo)
 
     print(circuito)
-    print(get_state(circuito))
